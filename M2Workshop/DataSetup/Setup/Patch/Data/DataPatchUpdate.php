@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace M2Workshop\DataSetup\Setup\Patch\Data;
 
@@ -10,7 +14,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 /**
 * Patch is mechanism, that allows to do atomic upgrade data changes
 */
-class DataPatchInstall implements
+class DataPatchUpdate implements
     DataPatchInterface
 {
     /**
@@ -34,14 +38,12 @@ class DataPatchInstall implements
     public function apply()
     {
         $this->moduleDataSetup->getConnection()->startSetup();
-        $data = [
-            ['name' => 'VolksWagen Passat', 'color'=>'black'],
-            ['name' => 'Peugeot', 'color'=>'red']
-        ];
-        foreach ($data as $bind) {
-            $this->moduleDataSetup->getConnection()
-                ->insertForce($this->moduleDataSetup->getTable('car'), $bind);
-        }
+        $table = $this->moduleDataSetup->getTable('car');
+        $this->moduleDataSetup->getConnection()
+            ->insertForce($table, ['brand' => 'Toyota Camry', 'color' => 'black']);
+
+        $this->moduleDataSetup->getConnection()
+            ->update($table, ['color' => 'red'], "brand = 'Peugeot'");
         $this->moduleDataSetup->getConnection()->endSetup();
     }
 
@@ -59,7 +61,7 @@ class DataPatchInstall implements
     public static function getDependencies()
     {
         return [
-
+            DataPatchInstall::class
         ];
     }
 }
